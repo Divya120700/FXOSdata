@@ -1,0 +1,43 @@
+
+    post {
+        always {
+            script {
+               def val= printLineContainingSearchValue(env.SEARCH_VALUE.toLowerCase())
+                // Define a milestone name
+                def milestoneName = "BuildCompleted"
+                
+                // Print a message indicating the milestone has been reached
+                echo "Milestone '${milestoneName}' reached!"
+                
+                // Mark a milestone for the current build
+                milestone ordinal: 1 // Change the ordinal to match the desired milestone
+            }
+        }
+    }
+}
+
+def printLineContainingSearchValue(searchValue) {
+    def targetLine = getLineContainingValueFromConsoleLog(searchValue)
+    if (targetLine != null) {
+        echo "Line containing '${searchValue}': ${targetLine}"
+        return targetLine
+    } else {
+        echo "No line found containing '${env.SEARCH_VALUE}'"
+        return null
+    }
+}
+
+
+
+def getLineContainingValueFromConsoleLog(name) {
+    def build = currentBuild.rawBuild
+    def consoleLog = build.getLog().readLines()
+                
+    for (String line : consoleLog) {
+        if (line.toLowerCase().contains(name)) {
+            return line
+        }
+    }
+    
+    return null
+}
